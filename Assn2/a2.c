@@ -1,3 +1,10 @@
+/*
+	CS3413 Operating Systems
+	a2.c
+	This is the driver program for the shell.
+	Performs commands, piped commands and suspends jobs with ^Z
+	Only allows for 1 active job at a time.
+*/
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,6 +47,7 @@ int main(int argc, char *argv[]){
 		parse_args(cmd, cmd_arr);
 		num_pipes = count_pipes(cmd_arr);
 
+		//Begin command logic
 		//Check for empty line or exit
 		if(cmd_arr[0] && strcmp(cmd,"exit\n")){
 			//Check for internal commands (cd, fg, bg)
@@ -61,7 +69,7 @@ int main(int argc, char *argv[]){
 				}else{
 					kill(pid_status[PID_IDX], SIGCONT);
 				}
-			}else if(pid_status[STATUS_IDX]){
+			}else if(pid_status[STATUS_IDX] > STATUS_SUSP_MIN){
 				printf("Not allowed to start a new command while you have a job active.\n");
 				printf("[HINT] Enter 'fg' to continue job\n");
 			}else{

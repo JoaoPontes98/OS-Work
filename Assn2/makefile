@@ -13,9 +13,6 @@ a2.o: a2.c $(DEPS)
 a2lib.o: a2lib.c $(DEPS)
 	$(CC) -c a2lib.c $(CFLAGS)
 
-run:
-	./$(EXE)
-
 clean:
 	rm *.o
 	rm $(EXE)
