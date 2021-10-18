@@ -5,4 +5,4 @@ All of my work so far of my Operating Systems course
 First proccess scheduling algorithm
 
 ## Assn2
-A simulated UNIX shell
+A simulated UNIX shell. It includes external commands, piped commands, and single job siignal control (suspend jobs and fg/bg).
