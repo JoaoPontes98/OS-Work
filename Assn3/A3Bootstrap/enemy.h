@@ -1,10 +1,10 @@
 #ifndef ENEMY_H
 #define ENEMY_H
 
-#define ENEMY_HEAD_ANIM_TILES 2
-#define ENEMY_BODY_ANIM_TILES 2
+#define ENEMY_ANIM_TILES 2
 #define ENEMY_ANIM_TICKS 50
-#define ENEMY_HEIGHT 1
+#define ENEMY_HEIGHT 2
+#define ENEMY_WIDTH 22
 
 #include "console.h"
 #include "threadwrappers.h"

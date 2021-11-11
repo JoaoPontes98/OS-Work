@@ -54,20 +54,20 @@ char *GAME_BOARD[] = {
 "" };
 
 
-#define ENEMY_HEIGHT 2
-#define ENEMY_WIDTH 1
-#define ENEMY_BODY_ANIM_TILES 4
-char* ENEMY_BODY[ENEMY_BODY_ANIM_TILES][ENEMY_HEIGHT] =
-{
-  {"1",
-   "1"},
-  {"2",
-   "2"},
-  {"3",
-   "3"},
-  {"4",
-   "4"}
-};
+// #define ENEMY_HEIGHT 2
+// #define ENEMY_WIDTH 1
+// #define ENEMY_BODY_ANIM_TILES 4
+// char* ENEMY_BODY[ENEMY_BODY_ANIM_TILES][ENEMY_HEIGHT] =
+// {
+//   {"1",
+//    "1"},
+//   {"2",
+//    "2"},
+//   {"3",
+//    "3"},
+//   {"4",
+//    "4"}
+// };
 
 bool end_game = false;
 
@@ -154,6 +154,10 @@ void centipedeRun()
     //create keyboard
     pthread_t keyboardT;
     wrappedPthreadCreate(&keyboardT, NULL, &keyboardRoutine, p);
+
+    //create Enenmy *This is temp*
+    enemy *e = spawnEnemy(4, 70);
+
     //above, initialize all the threads you need
     //below, you should make a "gameplay loop" that manages screen drawing
     //that  waits on a condition variable until the game is over
