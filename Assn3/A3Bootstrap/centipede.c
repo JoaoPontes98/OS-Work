@@ -79,12 +79,21 @@ typedef struct screen_struct
 } screen;
 
 void* screenRoutine(void *args){
+  screen *s = (screen*)(malloc(sizeof(screen)));
+  wrappedMutexAttrInit(&(s->attr));
+  pthread_mutexattr_settype(&(s->attr), PTHREAD_MUTEX_RECURSIVE); //might need to change this attribute
+  wrappedMutexInit(&(s->mutex), &(s->attr));
+
 	player *p = (player *)args;
 	char scoreboard[GAME_COLS];
 	while(!end_game){
 		snprintf(scoreboard, sizeof(scoreboard), "                   Score:          Lives:%d",p->lives);
-		putString(scoreboard, 0, 0, 50);
-		consoleRefresh();
+
+    wrappedMutexLock(&(s->mutex));
+    putString(scoreboard, 0, 0, 50);
+    consoleRefresh();
+    wrappedMutexUnlock(&(s->mutex));
+
 		sleepTicks(1);
 	}
 	return 0;
@@ -156,7 +165,8 @@ void centipedeRun()
     wrappedPthreadCreate(&keyboardT, NULL, &keyboardRoutine, p);
 
     //create Enenmy *This is temp*
-    enemy *e = spawnEnemy(4, 70);
+    enemy *e1 = spawnEnemy(2, 15);
+    enemy *e2 = spawnEnemy(4, 3);
 
     //above, initialize all the threads you need
     //below, you should make a "gameplay loop" that manages screen drawing

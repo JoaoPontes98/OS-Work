@@ -2,16 +2,14 @@
 
 char* enemyHeadGraphic[ENEMY_ANIM_TILES][ENEMY_HEIGHT] =
 {
-  {"B3",
-   "-."},
-  {"3B",
-   "--"},
+  {"B",
+   "-"},
+  {"3",
+   ","},
 };
 
 char* enemyBodyGraphic[ENEMY_ANIM_TILES][ENEMY_HEIGHT] =
 {
-  // {"[[[}[[[}[[[}[[[}[[[}",
-  //  ";:;:;:;:;:;:;:;:;:;:"}
   {"[",
    ";"},
   {"{",
@@ -36,11 +34,26 @@ void _enemyRedrawMoved(enemy *e, int prevRow, int prevCol, bool lock)
 	//TODO: lock screen (critical shared resource)
 	wrappedMutexLock(&(e->mutex));
 
-  // draw the head
-	consoleDrawImage(e->row, e->col, enemyHeadGraphic[e->animTile], ENEMY_HEIGHT);
-  //draw the body
-  for( int i = 0; i < ENEMY_WIDTH; i++){
-    consoleDrawImage(e->row, (e->col)+(2+i), enemyBodyGraphic[(i/3)%ENEMY_ANIM_TILES], ENEMY_HEIGHT);
+  if((e->row)%4 == 2) { // moving left
+    // Maybe add a var to enemy keeping track how much body is left to wrap
+    // if e->col < 0, then we start wrapping
+    //  e->row++ to move down one
+    //  e->wrapping = true;
+    //  e->numToBeWrapped = ENEMY_WIDTH-1
+
+    // draw the head
+  	consoleDrawImage(e->row, e->col, enemyHeadGraphic[e->animTile], ENEMY_HEIGHT);
+    // draw the body
+    for( int i = 0; i < ENEMY_WIDTH; i++){
+      consoleDrawImage(e->row, (e->col)+(1+i), enemyBodyGraphic[(i/3)%ENEMY_ANIM_TILES], ENEMY_HEIGHT);
+    }
+  } else { // moving right
+    // draw the head
+    consoleDrawImage(e->row, (e->col)+ENEMY_WIDTH+1, enemyHeadGraphic[e->animTile], ENEMY_HEIGHT);
+    // draw the body
+    for( int i = 0; i < ENEMY_WIDTH; i++){
+      consoleDrawImage(e->row, (e->col)+(1+i), enemyBodyGraphic[(i/3)%ENEMY_ANIM_TILES], ENEMY_HEIGHT);
+    }
   }
 
 	wrappedMutexUnlock(&(e->mutex));
@@ -52,12 +65,18 @@ void enemyRedraw(enemy *e, bool lock)
 	_enemyRedrawMoved(e, e->row, e->col, lock);
 }
 
-void enemyMove(enemy *e, int dRow, int dCol)
+void enemyMove(enemy *e)
 {
-	consoleClearImage(e->row, e->col, ENEMY_HEIGHT, ENEMY_WIDTH+5);
-	e->row += dRow;
-	e->col += dCol;
+  wrappedMutexLock(&(e->mutex));
+  if((e->row)%4 == 2) { // Move right every forth row (because the enemy has 2 height)
+    consoleClearImage(e->row, e->col, ENEMY_HEIGHT, ENEMY_WIDTH+1);
+  	e->col += -1;
+  } else {
+    consoleClearImage(e->row, e->col, ENEMY_HEIGHT, ENEMY_WIDTH+1);
+  	e->col += 1;
+  }
 	enemyRedraw(e, false);
+  wrappedMutexUnlock(&(e->mutex));
 }
 
 /**THREAD FUNCTIONS**/
@@ -68,6 +87,8 @@ enemy* spawnEnemy(int startRow, int startCol)
 	e->startCol = startCol;
 	e->startRow = startRow;
 	e->running = true;
+  e->numToBeWrapped = 0;
+  e->wrapping = false;
 
 	wrappedPthreadCreate(&(e->thread), NULL, runEnemyT, (void*)e);
 
@@ -89,7 +110,8 @@ void *runEnemyT(void *data)
 
 		e->animTile++;
 		e->animTile %= ENEMY_ANIM_TILES;
-    enemyMove(e, 0, -1);
+    //enemyMove(e, 0, -1);
+    enemyMove(e);
     enemyRedraw(e, false);
 		sleepTicks(ENEMY_ANIM_TICKS);
 	}

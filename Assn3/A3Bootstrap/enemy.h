@@ -19,10 +19,20 @@ typedef struct enemy_struct
 	int startCol;
 	int startRow;
 
+	// running/animation trackers
 	bool running;
+	int animTile;
+
+	// cordinates of the enemy
 	int row;
 	int col;
-	int animTile;
+
+	// When getting to edge of screen,
+	// This tracks how many sections of the enemy
+	// are left to wrap to next row.
+	int numToBeWrapped;
+	bool wrapping;
+
 	pthread_t thread;
 	pthread_mutex_t mutex;
 	pthread_mutexattr_t attr;
@@ -34,7 +44,7 @@ enemy* spawnEnemy(int startRow, int startCol);
 
 /* thread safe for enemy & ALSO LOCKS SCREEN */
 //yours may or may not lock the screen on call.
-void enemyMove(enemy *f, int dRow, int dCol);
+void enemyMove(enemy *f);
 
 /* NOT thread safe */
 /* removes a life, ends the game if all lives gone */
