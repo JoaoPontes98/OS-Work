@@ -166,7 +166,7 @@ void centipedeRun()
 
     //create Enenmy *This is temp*
     enemy *e1 = spawnEnemy(2, 15);
-    enemy *e2 = spawnEnemy(4, 3);
+    //enemy *e2 = spawnEnemy(4, 3);
 
     //above, initialize all the threads you need
     //below, you should make a "gameplay loop" that manages screen drawing

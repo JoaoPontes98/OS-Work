@@ -13,6 +13,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+// A linked list to represent the enemy's body sections
+typedef struct e_section
+{
+	int row;
+	int col;
+	struct e_section *next;
+} e_section;
+
 typedef struct enemy_struct
 {
 	/* remember the start parameters internally */
@@ -26,12 +34,7 @@ typedef struct enemy_struct
 	// cordinates of the enemy
 	int row;
 	int col;
-
-	// When getting to edge of screen,
-	// This tracks how many sections of the enemy
-	// are left to wrap to next row.
-	int numToBeWrapped;
-	bool wrapping;
+	e_section* spriteLL;
 
 	pthread_t thread;
 	pthread_mutex_t mutex;
@@ -52,5 +55,9 @@ void enemyMove(enemy *f);
 //and I made sure it was used in a thread safe way
 void killEnemy(enemy* p);
 
+// Generate the linked list sprite of the enemy.
+// Input is the length (including head) of enemy.
+// Only generates enemies sprites facing left.
+e_section* genEnemySprite(int head_col, int head_row, int length);
 
 #endif
