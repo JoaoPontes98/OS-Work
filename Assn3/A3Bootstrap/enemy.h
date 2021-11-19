@@ -19,9 +19,10 @@ typedef struct e_section
 	int row;
 	int col;
 	struct e_section *next;
+	struct e_section *tail;
 } e_section;
 
-typedef struct enemy_struct
+typedef struct enemy
 {
 	/* remember the start parameters internally */
 	int startCol;

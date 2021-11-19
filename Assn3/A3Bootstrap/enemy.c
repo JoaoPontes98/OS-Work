@@ -1,5 +1,6 @@
 #include "enemy.h"
-
+#define GAME_ROWS 24
+#define GAME_COLS 80
 char* enemyHeadGraphic[ENEMY_ANIM_TILES][ENEMY_HEIGHT] =
 {
   {"B",
@@ -25,9 +26,9 @@ void newEnemy(enemy *e)
 	e->animTile = 0;
 }
 
-void _enemyRedrawMoved(enemy *e, int prevRow, int prevCol, bool lock)
+void enemyRedraw(enemy *e, bool lock)
 {
-	//TODO
+  //TODO
 	//Dear students, this function is NOT THREAD SAFE and will require fixing
 	if(lock) return;
 
@@ -35,58 +36,45 @@ void _enemyRedrawMoved(enemy *e, int prevRow, int prevCol, bool lock)
 	wrappedMutexLock(&(e->mutex));
 
   e_section* e_head = e->spriteLL;
-  e_section* e_body = e_head->next;
+  e_section* e_curr = e_head;
   int i = 0;
 
-  if((e->row)%4 == 2) { // moving left
-    // draw the head
-  	consoleDrawImage(e_head->row, e_head->col, enemyHeadGraphic[e->animTile], ENEMY_HEIGHT);
-    // draw the body
-    while(e_body){
-      consoleDrawImage(e_body->row, e_body->col, enemyBodyGraphic[(i/3)%ENEMY_ANIM_TILES], ENEMY_HEIGHT);
-      e_body = e_body->next;
-      i++;
+  while(e_curr){
+    if(i == 0){ // draw the head
+      consoleDrawImage(e_curr->row, e_curr->col, enemyHeadGraphic[e->animTile], ENEMY_HEIGHT);
+    }else{ // draw the body
+      consoleDrawImage(e_curr->row, e_curr->col, enemyBodyGraphic[(i/3)%ENEMY_ANIM_TILES], ENEMY_HEIGHT);
     }
-  } else { // moving right
-    // draw the head
-    consoleDrawImage(e_head->row, e_head->col, enemyHeadGraphic[e->animTile], ENEMY_HEIGHT);
-    // draw the body
-    while(e_body){
-      consoleDrawImage(e_body->row, e_body->col, enemyBodyGraphic[(i/3)%ENEMY_ANIM_TILES], ENEMY_HEIGHT);
-      e_body = e_body->next;
-      i++;
-    }
+    e_curr = e_curr->next;
+    i++;
   }
-
 	wrappedMutexUnlock(&(e->mutex));
 	//TODO: unlock screen
-}
-
-void enemyRedraw(enemy *e, bool lock)
-{
-	_enemyRedrawMoved(e, e->row, e->col, lock);
 }
 
 void enemyMove(enemy *e)
 {
   //wrappedMutexLock(&(e->mutex));
   e_section* e_head = e->spriteLL;
-  e_section* e_body = e_head->next;
+  e_section* e_curr = e_head;
+  e_section* e_tail = e_head->tail;
 
-  if((e_head->row)%4 == 2) { // Move right every forth row (because the enemy has 2 height)
-    consoleClearImage(e_head->row, e_head->col, ENEMY_HEIGHT, ENEMY_WIDTH+1);
-  	e_head->col += -1;
-    while(e_body){
-      e_body -> col += -1;
-      e_body = e_body->next;
-    }
-  } else {
-    consoleClearImage(e_head->row, e_head->col, ENEMY_HEIGHT, ENEMY_WIDTH+1);
-    e_head->col += 1;
-    while(e_body){
-      e_body -> col += 1;
-      e_body = e_body->next;
-    }
+  //only clear the last section
+  consoleClearImage(e_tail->row, e_tail->col, ENEMY_HEIGHT, 2);
+  while(e_curr && e_curr->col != 0)
+  {
+      if(((e_curr->col) - 1) < 1 || ((e_curr->col) + 1) > GAME_COLS) // wrap sprite
+      {
+        e_curr->row += 2;
+      }
+
+      if((e_curr->row)%4 == 2) { // move LEFT
+        e_curr->col += -1;
+      }else{ //move RIGHT
+        e_curr->col += 1;
+      }
+
+      e_curr=e_curr->next;
   }
 	enemyRedraw(e, false);
   //wrappedMutexUnlock(&(e->mutex));
@@ -109,10 +97,11 @@ e_section* genEnemySprite(int head_col, int head_row, int length)
   e_head->row = head_row;
 
   int i;
-  for( i = 0; i < length; i++){
+  for( i = 1; i < length; i++){
     e_curr->next = mallocSpriteNode();
     e_curr->row = head_row;
     e_curr->col = head_col + (i + 1);
+    e_head->tail = e_curr;
     e_curr = e_curr->next;
   }
 
@@ -151,7 +140,6 @@ void *runEnemyT(void *data)
 		e->animTile++;
 		e->animTile %= ENEMY_ANIM_TILES;
     enemyMove(e);
-    enemyRedraw(e, false);
 		sleepTicks(ENEMY_ANIM_TICKS);
 	}
 	return NULL;

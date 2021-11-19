@@ -53,22 +53,6 @@ char *GAME_BOARD[] = {
 "",
 "" };
 
-
-// #define ENEMY_HEIGHT 2
-// #define ENEMY_WIDTH 1
-// #define ENEMY_BODY_ANIM_TILES 4
-// char* ENEMY_BODY[ENEMY_BODY_ANIM_TILES][ENEMY_HEIGHT] =
-// {
-//   {"1",
-//    "1"},
-//   {"2",
-//    "2"},
-//   {"3",
-//    "3"},
-//   {"4",
-//    "4"}
-// };
-
 bool end_game = false;
 
 typedef struct screen_struct
@@ -165,7 +149,7 @@ void centipedeRun()
     wrappedPthreadCreate(&keyboardT, NULL, &keyboardRoutine, p);
 
     //create Enenmy *This is temp*
-    enemy *e1 = spawnEnemy(2, 15);
+    enemy *e1 = spawnEnemy(6, 10);
     //enemy *e2 = spawnEnemy(4, 3);
 
     //above, initialize all the threads you need
