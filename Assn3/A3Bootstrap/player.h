@@ -36,7 +36,7 @@ typedef enum playerState_enum
 	GAMEOVER
 } playerState;
 
-typedef struct player_struct
+typedef struct player
 {
 	/* remember the start parameters internally */
 	int startCol;

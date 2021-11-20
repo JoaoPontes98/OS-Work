@@ -116,7 +116,9 @@ void* keyboardRoutine(void *args){
 				playerMove(p, 1, 0);
 			}else if(input == 'd'){
 				playerMove(p, 0, 1);
-			}else if(input == 'q'){
+			}else if(input == ' '){
+        firePBullet(p);
+      }else if(input == 'q'){
 				end_game = true;
 			}else if(input == 'f'){
 				p->lives = p->lives;

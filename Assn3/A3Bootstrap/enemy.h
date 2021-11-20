@@ -33,8 +33,6 @@ typedef struct enemy
 	int animTile;
 
 	// cordinates of the enemy
-	int row;
-	int col;
 	e_section* spriteLL;
 
 	pthread_t thread;

@@ -18,14 +18,6 @@ char* enemyBodyGraphic[ENEMY_ANIM_TILES][ENEMY_HEIGHT] =
 };
 
 /**SUPPORT FUNCTIONS**/
-/* reset the enemy state to start */
-void newEnemy(enemy *e)
-{
-	e->row = e->startRow;
-	e->col = e->startCol;
-	e->animTile = 0;
-}
-
 void enemyRedraw(enemy *e, bool lock)
 {
   //TODO
@@ -131,16 +123,22 @@ enemy* spawnEnemy(int startRow, int startCol)
 void *runEnemyT(void *data)
 {
 	enemy* e = (enemy*)data;
-	newEnemy(e);
+  int i = 0;
+  int r = rand()%5;
 
 	while (e->running)
 	{
 		//TODO: not threadsafe!!!!
-
 		e->animTile++;
 		e->animTile %= ENEMY_ANIM_TILES;
+    if(i == (5+r)){ // fire every 5-10 seconds
+      fireEBullet(e);
+      i = 0;
+      r = rand()%5;
+    }
     enemyMove(e);
 		sleepTicks(ENEMY_ANIM_TICKS);
+    i++;
 	}
 	return NULL;
 }
